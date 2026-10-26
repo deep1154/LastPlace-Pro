@@ -1,0 +1,38 @@
+name: Build LastPlace APK
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'LASTPLACE.zip'
+      - '.github/workflows/build.yml'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Extract project
+        run: unzip -q LASTPLACE.zip -d project
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - name: Install dependencies
+        working-directory: project/LastPlace_Pro_Final_Project
+        run: flutter pub get
+
+      - name: Build Android APK
+        working-directory: project/LastPlace_Pro_Final_Project
+        run: flutter build apk --release
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: LastPlace-APK
+          path: project/LastPlace_Pro_Final_Project/build/app/outputs/flutter-apk/app-release.apk
